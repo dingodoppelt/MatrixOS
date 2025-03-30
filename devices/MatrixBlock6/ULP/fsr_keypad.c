@@ -7,7 +7,7 @@
 #define Y_SIZE 8
 #define SAMPLES 4
 
-#define IIF_LENGTH 8
+#define IIF_LENGTH 4
 
 volatile gpio_num_t keypad_write_pins[X_SIZE] = 
 {
@@ -35,6 +35,7 @@ volatile adc_channel_t keypad_read_adc_channel[Y_SIZE] =
 
 
 volatile uint16_t result[X_SIZE][Y_SIZE];
+volatile uint16_t buffer[X_SIZE][Y_SIZE][IIF_LENGTH];
 
 volatile uint32_t count;
 
@@ -54,6 +55,7 @@ int main(void)
     }
   }
 
+  uint8_t z = 0;
   while(true)
   {
     for (uint8_t x = 0; x < X_SIZE; x++)
@@ -62,12 +64,18 @@ int main(void)
       for (uint8_t y = 0; y < Y_SIZE; y++)
       {
         uint16_t reading = ulp_riscv_adc_read_channel(ADC_UNIT_1, keypad_read_adc_channel[y]);
-        reading = (reading << 4) + (reading >> 8); 
+        uint32_t sum = 0;
+        reading = (reading << 4) + (reading >> 8);
+        buffer[x][y][z] = reading;
+        for (uint8_t i = 0; i < IIF_LENGTH; i++) {
+          sum += buffer[x][y][(z + i) % IIF_LENGTH];
+        }
 
-        result[x][y] = (result[x][y] * (IIF_LENGTH - 1) + reading) / IIF_LENGTH;
+        result[x][y] = sum / IIF_LENGTH;
       }
       ulp_riscv_gpio_output_level(keypad_write_pins[x], 0);
     }
     count++;
+    z = (z + 1) % IIF_LENGTH;
   }
 }
