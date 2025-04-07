@@ -164,8 +164,13 @@ void ForceCalibration::ForceGridVisualizer()
 
         if (keyInfo->velocity.to8bits() > 127) { activeKey = Point(x, y); }
 
-        // if (activeKey.x == x && activeKey.y == y)
-        // { MLOGD("ForceGridVisualizer", "%d %d\tRaw Read: %d\t16bit: %d\tThreshold: %d\tActive %d", x, y, keyInfo->raw_velocity, keyInfo->velocity, keyInfo->threshold, keyInfo->active()); }
+        // Report raw reading to uart
+        uint16_t raw_reading = Device::KeyPad::FSR::GetRawReading(x, y);
+
+        if (activeKey.x == x && activeKey.y == y)
+        { 
+          MatrixOS::USB::CDC::Printf("[%d %d]\tRaw Read: %d\tmapped: %d\tActive %d\n", x, y, raw_reading, keyInfo->velocity, keyInfo->active()); 
+        }
       } 
     }
   });
