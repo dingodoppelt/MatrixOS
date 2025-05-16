@@ -1,9 +1,9 @@
 // Define Device Specific Macro, Value and private function
 #pragma once
 
-#define GRID_8x8
-#define FAMILY MYSTRIX
-#define MODEL MX1
+#define GRID_TYPE_8x8
+#define FAMILY_MYSTRIX
+
 
 #define DEVICE_BATTERY
 
@@ -66,14 +66,14 @@ namespace Device
   };
 
   // Device Specific
-  inline uint16_t keypad_scanrate = 480;
-  inline uint16_t touchbar_scanrate = 60;
   const uint8_t x_size = 8;
   const uint8_t y_size = 8;
-  const uint8_t touchbar_size = 16;  // Not required by the API, private use.
-
   namespace KeyPad
   {
+    inline uint16_t keypad_scanrate = 480;
+    inline uint16_t touchbar_scanrate = 60;
+    const uint8_t touchbar_size = 16;
+
     inline gpio_num_t fn_pin;
     inline bool fn_active_low = true;
     inline bool velocity_sensitivity = false;
@@ -114,12 +114,12 @@ namespace Device
     inline gpio_num_t rx_gpio = GPIO_NUM_NC;
   }
 
-// LED
-#define MAX_LED_LAYERS 8
-  inline gpio_num_t led_pin;
-  const inline uint16_t fps = 120;  // Depends on the FreeRTOS tick speed
-  // const Dimension grid_size(8,8);
-  // const Point grid_offset = Point(1,1);
+  namespace LED
+  {
+    #define MAX_LED_LAYERS 8
+    inline gpio_num_t led_pin;
+    const inline uint16_t fps = 120;  // Depends on the FreeRTOS tick speed
+  }
 
   // Load Device config
   void LoadV100();
